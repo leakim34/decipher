@@ -1,4 +1,4 @@
-import type { PromptType } from '$lib/services/claude.server';
+import type { AIProvider, PromptType } from '$lib/types/ai.types';
 
 /**
  * Analysis form data
@@ -6,11 +6,14 @@ import type { PromptType } from '$lib/services/claude.server';
 export interface AnalysisForm {
   applicationId?: string;
   promptType?: PromptType;
+  aiProvider?: AIProvider;
+  aiModel?: string;
   error?: string;
   success?: boolean;
   explanation?: string;
   decodedProgram?: string;
   applicationInfo?: any;
+  [key: string]: unknown; // Add index signature for Record compatibility
 }
 
 /**
@@ -19,4 +22,6 @@ export interface AnalysisForm {
 export interface AnalysisParams {
   applicationId: string;
   promptType: PromptType;
+  aiProvider?: AIProvider;
+  aiModel?: string;
 } 

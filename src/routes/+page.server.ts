@@ -1,8 +1,92 @@
 import { fail } from '@sveltejs/kit';
-import type { Actions } from './$types';
-import { getApplicationTEAL, validateApplicationId } from '$lib/services/algorand.server';
-import { analyzeSmartContract, type PromptType } from '$lib/services/claude.server';
+import type { Actions, PageServerLoad } from './$types';
+import { getApplicationTEAL, validateApplicationId } from '$lib/server/services/algorand.service';
+import { AIServiceFactory, defaultAIConfig } from '$lib/server/services/ai/ai.service';
+import type { AIModelConfig } from '$lib/server/services/ai/types';
+import { AIProvider as ServerAIProvider } from '$lib/server/services/ai/types';
 import type { AnalysisForm } from '$lib/types';
+import type { AIModel, PromptType } from '$lib/types/ai.types';
+import { AIProvider } from '$lib/types/ai.types';
+
+// Map server-side provider to client-side provider
+function mapProviderToClient(provider: ServerAIProvider): AIProvider {
+  switch (provider) {
+    case ServerAIProvider.Claude:
+      return AIProvider.Claude;
+    case ServerAIProvider.OpenAI:
+      return AIProvider.OpenAI;
+    case ServerAIProvider.Gemini:
+      return AIProvider.Gemini;
+    default:
+      return AIProvider.Claude;
+  }
+}
+
+// Map client-side provider to server-side provider
+function mapProviderToServer(provider: AIProvider): ServerAIProvider {
+  switch (provider) {
+    case AIProvider.Claude:
+      return ServerAIProvider.Claude;
+    case AIProvider.OpenAI:
+      return ServerAIProvider.OpenAI;
+    case AIProvider.Gemini:
+      return ServerAIProvider.Gemini;
+    default:
+      return ServerAIProvider.Claude;
+  }
+}
+
+/**
+ * Load data for the page
+ */
+export const load: PageServerLoad = async () => {
+  // Initialize AI service factory
+  const aiServiceFactory = AIServiceFactory.getInstance();
+  
+  // Get all AI models from server and transform to client models
+  const serverModels = aiServiceFactory.getAllModels();
+  const clientModels: AIModel[] = serverModels.map(model => ({
+    id: model.id,
+    name: model.name,
+    provider: mapProviderToClient(model.provider),
+    description: model.description,
+    capabilities: model.capabilities
+  }));
+  
+  // Define available prompt types with descriptions
+  const promptTypes = [
+    { 
+      value: 'standard' as PromptType, 
+      label: 'Standard Analysis',
+      description: 'General explanation of the contract\'s purpose and functionality'
+    },
+    { 
+      value: 'detailed' as PromptType, 
+      label: 'Detailed Technical Analysis',
+      description: 'Detailed technical breakdown of the contract\'s components'
+    },
+    { 
+      value: 'security' as PromptType, 
+      label: 'Security Assessment',
+      description: 'Security-focused assessment highlighting potential risks'
+    },
+    { 
+      value: 'userFriendly' as PromptType, 
+      label: 'Non-Technical Explanation',
+      description: 'Simplified explanation for non-technical users'
+    }
+  ];
+  
+  // Return data for the client
+  return {
+    aiModels: clientModels,
+    promptTypes,
+    defaultConfig: {
+      provider: mapProviderToClient(defaultAIConfig.provider),
+      model: defaultAIConfig.model
+    }
+  };
+};
 
 /**
  * Server-side actions for the page
@@ -17,7 +101,21 @@ export const actions: Actions = {
     const applicationId = formData.get('applicationId')?.toString() || '';
     const promptType = (formData.get('promptType')?.toString() || 'standard') as PromptType;
     
-    console.log('Analysis request:', { applicationId, promptType });
+    // Get AI configuration from form data
+    const clientAiProvider = formData.get('aiProvider')?.toString() || AIProvider.Claude;
+    const aiModel = formData.get('aiModel')?.toString() || defaultAIConfig.model;
+    
+    // Map client provider to server provider
+    const serverAiProvider = mapProviderToServer(clientAiProvider as AIProvider);
+    
+    const aiConfig: AIModelConfig = {
+      provider: serverAiProvider,
+      model: aiModel,
+      maxTokens: 4000,
+      temperature: 0.7
+    };
+    
+    console.log('Analysis request:', { applicationId, promptType, provider: serverAiProvider, model: aiModel });
 
     // Validate application ID
     if (!validateApplicationId(applicationId)) {
@@ -25,7 +123,9 @@ export const actions: Actions = {
       return fail(400, {
         error: 'Invalid application ID format',
         applicationId,
-        promptType
+        promptType,
+        aiProvider: clientAiProvider,
+        aiModel
       });
     }
 
@@ -34,30 +134,39 @@ export const actions: Actions = {
       console.log('Fetching and disassembling TEAL code...');
       const decodedProgram = await getApplicationTEAL(applicationId);
       
-      // Analyze the smart contract using Claude
-      console.log(`Analyzing with prompt type: ${promptType}`);
-      const explanation = await analyzeSmartContract(decodedProgram, promptType);
+      // Initialize AI service factory
+      const aiServiceFactory = AIServiceFactory.getInstance();
+      
+      // Analyze the smart contract using selected AI provider
+      console.log(`Analyzing with ${serverAiProvider}/${aiModel}, prompt type: ${promptType}`);
+      const analysis = await aiServiceFactory.analyzeSmartContract(decodedProgram, promptType, aiConfig);
       console.log('Successfully generated explanation');
       
       return {
         success: true,
         applicationId,
         promptType,
+        aiProvider: clientAiProvider,
+        aiModel,
         decodedProgram,
-        explanation
+        explanation: analysis.text
       } as AnalysisForm;
     } catch (error) {
       console.error('Error analyzing contract:', {
         error: error instanceof Error ? error.message : 'Unknown error',
         applicationId,
         promptType,
+        aiProvider: clientAiProvider,
+        aiModel,
         stack: error instanceof Error ? error.stack : undefined
       });
       
       return fail(500, {
         error: error instanceof Error ? error.message : 'An unknown error occurred',
         applicationId,
-        promptType
+        promptType,
+        aiProvider: clientAiProvider,
+        aiModel
       } as AnalysisForm);
     }
   }
