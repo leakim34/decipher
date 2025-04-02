@@ -1,13 +1,6 @@
 import { createClient } from 'redis';
 import { REDIS_URL, REDIS_CACHE_EXPIRATION } from '$env/static/private';
-
-interface CachedAnalysisResult {
-  applicationId: string;
-  explanation: string;
-  basicOverview: string;
-  detailedAnalysis: string;
-  timestamp: number;
-}
+import type { CachedAnalysisResult } from '$lib/types';
 
 /**
  * Cache service for Algorand application analysis results
@@ -213,6 +206,53 @@ export class CacheService {
       await this.client.del(key);
     } catch (error) {
       console.error('Error clearing cached analysis from Redis:', error);
+    }
+  }
+
+  /**
+   * Get recent analyses (up to 10 most recent)
+   */
+  public async getRecentAnalyses(limit: number = 10): Promise<CachedAnalysisResult[]> {
+    // If using memory fallback, return from memory
+    if (this.useMemoryFallback) {
+      // Sort by timestamp and take the most recent ones
+      return Array.from(this.memoryCache.values())
+        .sort((a, b) => b.timestamp - a.timestamp)
+        .slice(0, limit);
+    }
+    
+    // If not connected to Redis, fall back to memory
+    if (!this.isConnected || !this.client) {
+      return Array.from(this.memoryCache.values())
+        .sort((a, b) => b.timestamp - a.timestamp)
+        .slice(0, limit);
+    }
+    
+    try {
+      // Get all keys matching the pattern
+      const keys = await this.client.keys('analysis:*');
+      
+      if (keys.length === 0) {
+        return [];
+      }
+      
+      // Get all values
+      const values = await Promise.all(
+        keys.map((key: string) => this.client!.get(key))
+      );
+      
+      // Parse and sort by timestamp
+      return values
+        .filter(Boolean)
+        .map((data: string | null) => JSON.parse(data as string) as CachedAnalysisResult)
+        .sort((a: CachedAnalysisResult, b: CachedAnalysisResult) => b.timestamp - a.timestamp)
+        .slice(0, limit);
+    } catch (error) {
+      console.error('Error getting recent analyses from Redis:', error);
+      // Fall back to memory cache on error
+      return Array.from(this.memoryCache.values())
+        .sort((a, b) => b.timestamp - a.timestamp)
+        .slice(0, limit);
     }
   }
 } 

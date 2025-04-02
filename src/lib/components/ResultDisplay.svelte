@@ -1,4 +1,6 @@
 <script lang="ts">
+  import TitleWithLink from './TitleWithLink.svelte';
+  
   let { 
     success,
     explanation, 
@@ -15,13 +17,20 @@
     applicationId: string;
   }>();
   
-  // State for view toggle
+  // State for view toggle - default to basic view
   let showDetailedView = $state(false);
   
   // Toggle between basic and detailed view
   function toggleView() {
     showDetailedView = !showDetailedView;
   }
+  
+  // Reset to basic view whenever the application ID changes
+  $effect(() => {
+    if (applicationId) {
+      showDetailedView = false;
+    }
+  });
   
   // Format text with markdown-like features
   function formatContent(content: string): string {
@@ -72,8 +81,11 @@
 {#if success && (basicOverview || detailedAnalysis)}
   <div class="mt-8">
     <div class="bg-slate-800/50 backdrop-blur-sm rounded-xl overflow-hidden shadow-xl border border-slate-700 p-6">
-      <div class="flex justify-between items-center mb-4 pb-4 border-b border-slate-700">
-        <h2 class="text-xl font-semibold text-white">Smart Contract Translation</h2>
+      <div>
+        <TitleWithLink title="Smart Contract Translation" {applicationId} />
+      </div>
+      
+      <div class="flex justify-end items-center mb-4 mt-2">
         <div class="flex items-center space-x-3">
           <button 
             onclick={downloadJson}
@@ -102,14 +114,14 @@
         {#if !showDetailedView && basicOverview}
           <div class="space-y-4 animate-fadeIn">
             <div class="text-slate-300">
-              <h3 class="text-lg font-medium text-emerald-400 mb-4">Basic Overview</h3>
+              <h3 class="text-lg font-medium text-cyan-400 mb-4">Basic Overview</h3>
               
               <div class="whitespace-pre-line">
                 {#if basicOverview.includes("One-sentence explanation:") || basicOverview.includes("In other words...")}
                   <!-- Format with sections -->
                   {#each basicOverview.split('\n') as line}
                     {#if line.trim().startsWith("One-sentence explanation:") || line.trim().startsWith("In other words...")}
-                      <p class="mb-2 font-medium text-emerald-300">{line}</p>
+                      <p class="mb-2 font-medium text-cyan-300">{line}</p>
                     {:else if line.trim().startsWith("-")}
                       <p class="mb-1 ml-4">{line}</p>
                     {:else if line.trim() !== ''}
@@ -139,7 +151,9 @@
                 {#if detailedAnalysis.includes("Main purpose of the contract:") || detailedAnalysis.includes("Key capabilities:")}
                   <!-- Format with recognized sections -->
                   {#each detailedAnalysis.split('\n') as line}
-                    {#if line.trim().startsWith("Main purpose") || line.trim().startsWith("Key capabilities") || line.trim().startsWith("list of methods")}
+                    {#if line.trim().toLowerCase().startsWith("main purpose") || 
+                        line.trim().toLowerCase().startsWith("key capabilities") || 
+                        line.trim().toLowerCase().startsWith("list of method")}
                       <p class="mb-2 mt-4 font-medium text-emerald-300">{line}</p>
                     {:else if line.trim().startsWith("-")}
                       <div class="ml-4 mb-1">{line}</div>

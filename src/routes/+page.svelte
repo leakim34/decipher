@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { AnalysisForm } from '$lib/types';
+  import type { AnalysisForm, CachedAnalysisResult } from '$lib/types';
   
   // Import our components
   import Header from '$lib/components/Header.svelte';
@@ -8,15 +8,19 @@
   import ErrorDisplay from '$lib/components/ErrorDisplay.svelte';
   import ResultDisplay from '$lib/components/ResultDisplay.svelte';
   import MessageAnimation from '$lib/components/MessageAnimation.svelte';
+  import RecentAnalyses from '$lib/components/RecentAnalyses.svelte';
   
   // Use props to get data from the server
-  let { form } = $props<{ 
-    form: AnalysisForm | null
+  let { form, data } = $props<{ 
+    form: AnalysisForm | null;
+    data: {
+      recentAnalyses: CachedAnalysisResult[];
+    };
   }>();
   
   // Extract form and result data using derived values
   let formData = $derived<AnalysisForm>(form || {});
-  let applicationId = $derived(formData.applicationId || '1134695678');
+  let applicationId = $derived(formData.applicationId);
   
   let error = $derived(formData.error || null);
   let success = $derived(formData.success || null);
@@ -24,6 +28,9 @@
   let basicOverview = $derived(formData.basicOverview || null);
   let detailedAnalysis = $derived(formData.detailedAnalysis || null);
   let decodedProgram = $derived(formData.decodedProgram || null);
+  
+  // Extract recent analyses from data
+  let recentAnalyses = $derived(data.recentAnalyses || []);
 </script>
 
 <div class="min-h-screen bg-gradient-to-br from-slate-900 to-slate-800 text-slate-100">
@@ -50,6 +57,11 @@
         detailedAnalysis={detailedAnalysis}
         decodedProgram={decodedProgram}
         applicationId={applicationId}
+      />
+      
+      <!-- Recent Analyses -->
+      <RecentAnalyses 
+        analyses={recentAnalyses}
       />
     </div>
   </main>

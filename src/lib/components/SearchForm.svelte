@@ -3,7 +3,7 @@
   import { startAnimation, stopAnimation } from './MessageAnimation.svelte';
   
   let { 
-    applicationId = '1134695678'
+    applicationId = ''
   } = $props<{
     applicationId?: string;
   }>();

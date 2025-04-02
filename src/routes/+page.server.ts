@@ -12,8 +12,18 @@ const cacheService = CacheService.getInstance();
  * Load data for the page
  */
 export const load: PageServerLoad = async () => {
-  // No data needed for the client now
-  return {};
+  // Get recent analyses from the cache
+  try {
+    const recentAnalyses = await cacheService.getRecentAnalyses(10);
+    return {
+      recentAnalyses
+    };
+  } catch (error) {
+    console.error('Error fetching recent analyses:', error);
+    return {
+      recentAnalyses: []
+    };
+  }
 };
 
 /**

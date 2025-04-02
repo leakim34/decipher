@@ -18,6 +18,17 @@ export interface AnalysisForm {
 }
 
 /**
+ * Cached analysis result
+ */
+export interface CachedAnalysisResult {
+  applicationId: string;
+  explanation: string;
+  basicOverview: string;
+  detailedAnalysis: string;
+  timestamp: number;
+}
+
+/**
  * Analysis request parameters
  */
 export interface AnalysisParams {
