@@ -20,21 +20,7 @@ export interface AIModel {
 }
 
 /**
- * Type for prompt template keys
- */
-export type PromptType = 'standard' | 'detailed' ;
-
-/**
- * Prompt information with name and description
- */
-export interface PromptInfo {
-  value: PromptType;
-  label: string;
-  description: string;
-}
-
-/**
- * Contract prompt templates
+ * Contract prompt template
  */
 export interface PromptTemplate {
   name: string;
@@ -73,43 +59,27 @@ export interface AIService {
 }
 
 /**
- * Contract prompt templates collection
+ * Standard contract prompt template
  */
-export const contractPrompts: Record<PromptType, PromptTemplate> = {
-  standard: {
-    name: 'Standard Analysis',
-    description: 'General explanation of the contract\'s purpose and functionality',
-    template: `
-      You will be provided with TEAL code (Algorand's smart contract language). 
-      You'll have to analyse the code.
-      Your task is to give a brief explanation of the smart contract.
-      Always convert methods and variables sto their human readable form.
-      
-      Here is the TEAL code:
-      [TEALCODE]
-      
-      Your response should contain:
-      - Type of the smart contract
-      - Brief explanation of the smart contract
-      - Main methods found
-      - Any other relevant information
-      `,
-  },
-  detailed: {
-    name: 'Detailed Technical Analysis',
-    description: 'Detailed technical breakdown of the contract\'s components',
-    template: `The following is TEAL code from an Algorand smart contract. Please analyze it thoroughly and provide:
+export const contractPrompt: PromptTemplate = {
+  name: 'Standard Analysis',
+  description: 'Clear explanation of the contract\'s purpose and functionality',
+  template: `Analyze accurately this TEAL code (Algorand blockchain smart contract language, assembly like language) and provide TWO separate responses:
 
-1. A high-level summary of the contract's purpose
-2. Key functions and their operations
-3. State variables and their significance
-4. Access control mechanisms
-5. Transaction flow and conditions
-6. Any security considerations or potential vulnerabilities
-7. Any unusual or notable patterns in the code
+### BASIC OVERVIEW
+- One-sentence explanation of what this contract does (in plain language for someone with no blockchain knowledge)
+- "In other words..." brief explanation (2-3 sentences) that clarifies the purpose using everyday language
 
-TEAL CODE:
-[TEALCODE]`
-  },
-  
+### DETAILED ANALYSIS
+- Main purpose of the contract
+- Key capabilities (3-5 bullet points)
+- list of methods available
+
+Please present these two response with this format:
+<basic: [BASIC OVERVIEW] >
+<detailed: [DETAILED ANALYSIS] >
+Do not include any other text or suggestions than the two sections asked.
+CODE:
+[TEALCODE]
+  `,
 };

@@ -1,5 +1,5 @@
-import type { AIModel, AIModelConfig, AIResponse, AIService, PromptType } from '$shared/types';
-import { AIProvider, contractPrompts } from '$shared/types';
+import type { AIModel, AIModelConfig, AIResponse, AIService } from '$shared/types';
+import { AIProvider, contractPrompt } from '$shared/types';
 import { ClaudeService } from './claude.service';
 import { OpenAIService } from './openai.service';
 import { GeminiService } from './gemini.service';
@@ -9,9 +9,9 @@ import { GeminiService } from './gemini.service';
  */
 export const defaultAIConfig: AIModelConfig = {
   provider: AIProvider.Claude,
-  model: 'claude-3-opus-20240229',
-  maxTokens: 4000,
-  temperature: 0.7
+  model: 'claude-3-haiku-20240307',
+  maxTokens: 2000,
+  temperature: 0.2
 };
 
 /**
@@ -69,14 +69,12 @@ export class AIServiceFactory {
    */
   public async analyzeSmartContract(
     tealCode: string,
-    promptType: PromptType = 'standard',
     config: AIModelConfig = defaultAIConfig
   ): Promise<AIResponse> {
     const service = this.getService(config.provider);
     
     // Get the prompt template and substitute the TEAL code
-    const promptTemplate = contractPrompts[promptType];
-    const prompt = promptTemplate.template.replace('[TEALCODE]', tealCode);
+    const prompt = contractPrompt.template.replace('[TEALCODE]', tealCode);
     
     return await service.analyze(prompt, config);
   }
