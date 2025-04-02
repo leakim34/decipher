@@ -39,6 +39,7 @@
 	"dependencies": {
 		"@algorandfoundation/algokit-utils": "^9.0.0",
 		"@sveltejs/adapter-node": "^5.2.12",
-		"algosdk": "^3.0.0"
+		"algosdk": "^3.0.0",
+		"redis": "^4.7.0"
 	}
 }

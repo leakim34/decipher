@@ -79,7 +79,7 @@ export async function getApplicationTEAL(applicationId: string): Promise<string>
     const approvalProgram = appInfo.application.params.approvalProgram;
     
     // Convert to Buffer for disassembly
-    const buffer = Buffer.from(approvalProgram);
+    const buffer = Buffer.from(approvalProgram, 'base64');
     
     // Disassemble the TEAL bytecode
     return await disassembleTEAL(buffer as any);

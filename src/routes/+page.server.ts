@@ -3,6 +3,10 @@ import type { Actions, PageServerLoad } from './$types';
 import { getApplicationTEAL, validateApplicationId } from '$lib/server/services/algorand.service';
 import { AIServiceFactory, defaultAIConfig } from '$lib/server/services/ai/ai.service';
 import type { AnalysisForm } from '$lib/types';
+import { CacheService } from '$lib/server/services/cache.service';
+
+// Initialize cache service early, before any requests come in
+const cacheService = CacheService.getInstance();
 
 /**
  * Load data for the page
@@ -29,10 +33,6 @@ function parseAnalysisResponse(text: string): { basicOverview: string; detailedA
     basicOverview = basicMatch?.[1]?.trim() || text;
     detailedAnalysis = detailedMatch?.[1]?.trim() || '';
 
-    console.log("Parsing results:");
-    console.log("Basic Overview length:", basicOverview.length);
-    console.log("Detailed Analysis length:", detailedAnalysis.length);
-    console.log("Using markers:", !!basicMatch && !!detailedMatch);
   } catch (error) {
     console.warn('Error parsing analysis response:', error);
     // Fall back to the full text
@@ -64,6 +64,22 @@ export const actions: Actions = {
     }
 
     try {
+      // Check cache first - no need to initialize here, already done at top level
+      const cachedAnalysis = await cacheService.getCachedAnalysis(applicationId);
+      
+      if (cachedAnalysis) {
+        console.log(`Found cached analysis for application ${applicationId}`);
+        return {
+          success: true,
+          applicationId,
+          explanation: cachedAnalysis.explanation,
+          basicOverview: cachedAnalysis.basicOverview,
+          detailedAnalysis: cachedAnalysis.detailedAnalysis
+        } as AnalysisForm;
+      }
+      
+      console.log(`No cached analysis found for application ${applicationId}, generating new analysis...`);
+      
       // Get the TEAL code for the application
       console.log('Fetching and disassembling TEAL code...');
       const decodedProgram = await getApplicationTEAL(applicationId);
@@ -78,6 +94,14 @@ export const actions: Actions = {
       
       // Parse the response to extract the sections
       const { basicOverview, detailedAnalysis } = parseAnalysisResponse(analysis.text);
+      
+      // Cache the analysis result
+      await cacheService.cacheAnalysis(
+        applicationId,
+        analysis.text,
+        basicOverview,
+        detailedAnalysis
+      );
       
       return {
         success: true,
