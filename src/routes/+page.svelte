@@ -182,19 +182,18 @@
   <div class="py-6 bg-gradient-to-r from-emerald-600 to-teal-500 shadow-lg">
     <div class="container mx-auto px-4">
       <div class="flex items-center space-x-3">
-        <!-- Blockchain icon -->
-        <div class="h-10 w-10 bg-white/10 rounded-lg flex items-center justify-center backdrop-blur-sm">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M20 12V8H4v4" />
-            <path d="M4 16v-4" />
-            <path d="M20 16v-4" />
-            <path d="M15 8V4" />
-            <path d="M9 8V4" />
-            <path d="M9 20v-4" />
-            <path d="M15 20v-4" />
-            <rect x="4" y="4" width="16" height="4" rx="1" />
-            <rect x="4" y="12" width="16" height="4" rx="1" />
-            <rect x="4" y="16" width="16" height="4" rx="1" />
+        <!-- Minimalist Logo - No Background -->
+        <div class="h-12 w-12 flex items-center justify-center">
+          <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" class="drop-shadow-lg">
+            <!-- Abstract representation of code transformation - larger elements -->
+            <path d="M14 16L8 24L14 32" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" />
+            <path d="M34 16L40 24L34 32" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" />
+            
+            <!-- Central element representing transformation -->
+            <path d="M18 10L30 38" stroke="#80FFD4" stroke-width="3" stroke-linecap="round" />
+            
+            <!-- Simple block representing a smart contract - larger -->
+            <rect x="20" y="20" width="8" height="8" rx="1.5" fill="white" fill-opacity="0.95" />
           </svg>
         </div>
         <div>
@@ -388,9 +387,9 @@
         <div class="mt-8">
           <div class="bg-slate-800/50 backdrop-blur-sm rounded-xl overflow-hidden shadow-xl border border-slate-700 p-6">
             <div class="flex justify-between items-center mb-4 pb-4 border-b border-slate-700">
-              <h2 class="text-xl font-semibold text-white">Smart Contract Analysis</h2>
+              <h2 class="text-xl font-semibold text-white">Smart Contract Translation</h2>
               <span class="text-sm px-3 py-1 bg-emerald-500/20 text-emerald-400 rounded-full border border-emerald-500/30">
-                {promptTypes.find((p: PromptInfo) => p.value === promptType)?.label || 'Standard Analysis'}
+                {promptTypes.find((p: PromptInfo) => p.value === promptType)?.label || 'Standard Translation'}
               </span>
             </div>
             <div class="prose prose-invert max-w-none">
@@ -406,7 +405,7 @@
                   <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
                     <path fill-rule="evenodd" d="M12.316 3.051a1 1 0 01.633 1.265l-4 12a1 1 0 11-1.898-.632l4-12a1 1 0 011.265-.633zM5.707 6.293a1 1 0 010 1.414L3.414 10l2.293 2.293a1 1 0 11-1.414 1.414l-3-3a1 1 0 010-1.414l3-3a1 1 0 011.414 0zm8.586 0a1 1 0 011.414 0l3 3a1 1 0 010 1.414l-3 3a1 1 0 11-1.414-1.414L16.586 10l-2.293-2.293a1 1 0 010-1.414z" clip-rule="evenodd" />
                   </svg>
-                  View Raw TEAL Code
+                  View Robot Language (TEAL Code)
                 </span>
                 <svg class="h-5 w-5 text-slate-400 group-open:rotate-180 transition-transform duration-200" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
                   <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
@@ -426,7 +425,7 @@
   <footer class="py-6 border-t border-slate-800">
     <div class="container mx-auto px-4">
       <div class="text-center text-slate-500 text-sm">
-        <p>Powered by Algorand and AI • Analyze smart contracts with confidence</p>
+        <p>Powered by Algorand and AI • Making crypto contracts human-friendly</p>
       </div>
     </div>
   </footer>
