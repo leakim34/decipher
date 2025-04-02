@@ -2,11 +2,11 @@ import { fail } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
 import { getApplicationTEAL, validateApplicationId } from '$lib/server/services/algorand.service';
 import { AIServiceFactory, defaultAIConfig } from '$lib/server/services/ai/ai.service';
-import type { AIModelConfig } from '$lib/server/services/ai/types';
-import { AIProvider as ServerAIProvider } from '$lib/server/services/ai/types';
+import type { AIModelConfig } from '$shared/types';
+import { AIProvider as ServerAIProvider } from '$shared/types';
 import type { AnalysisForm } from '$lib/types';
-import type { AIModel, PromptType } from '$lib/types/ai.types';
-import { AIProvider } from '$lib/types/ai.types';
+import type { AIModel, PromptType } from '$shared/types';
+import { AIProvider } from '$shared/types';
 
 // Map server-side provider to client-side provider
 function mapProviderToClient(provider: ServerAIProvider): AIProvider {
@@ -57,24 +57,15 @@ export const load: PageServerLoad = async () => {
   const promptTypes = [
     { 
       value: 'standard' as PromptType, 
-      label: 'Standard Analysis',
-      description: 'General explanation of the contract\'s purpose and functionality'
+      label: 'For Everyone',
+      description: 'Clear, jargon-free explanation of what this smart contract does in everyday terms'
     },
     { 
       value: 'detailed' as PromptType, 
-      label: 'Detailed Technical Analysis',
-      description: 'Detailed technical breakdown of the contract\'s components'
-    },
-    { 
-      value: 'security' as PromptType, 
-      label: 'Security Assessment',
-      description: 'Security-focused assessment highlighting potential risks'
-    },
-    { 
-      value: 'userFriendly' as PromptType, 
-      label: 'Non-Technical Explanation',
-      description: 'Simplified explanation for non-technical users'
+      label: 'For Developers',
+      description: 'Detailed technical breakdown'
     }
+
   ];
   
   // Return data for the client

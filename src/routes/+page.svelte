@@ -1,8 +1,8 @@
 <script lang="ts">
   import { enhance } from '$app/forms';
-  import type { PromptType, AIModel, PromptInfo } from '$lib/types/ai.types';
+  import type { PromptType, AIModel, PromptInfo } from '$shared/types';
   import type { AnalysisForm } from '$lib/types';
-  import { AIProvider } from '$lib/types/ai.types';
+  import { AIProvider } from '$shared/types';
   
   // Use props to get data from the server
   let { form, data } = $props<{ 
@@ -144,12 +144,12 @@
   
   // Extract form and result data using derived values
   let formData = $derived<AnalysisForm>(form || {});
-  let applicationId = $derived(formData.applicationId || '2289177011');
+  let applicationId = $derived(formData.applicationId || '1134695678');
   let promptType = $derived<PromptType>(formData.promptType || 'standard');
   
   // Fixed to Claude and haiku for now
-  let aiProvider = $state<AIProvider>(AIProvider.Claude);
-  let aiModel = $state('claude-haiku');
+  let aiProvider = $state<AIProvider>(data.defaultConfig.provider);
+  let aiModel = $state(data.defaultConfig.model);
   
   let error = $derived(formData.error);
   let success = $derived(formData.success);
@@ -159,7 +159,14 @@
   // Get all models from server data
   const allModels = $state(data.aiModels);
   // Filter models by provider - only Claude models for now
-  let availableModels = $derived(allModels.filter((model: AIModel) => model.provider === AIProvider.Claude));
+  let availableModels = $derived(allModels.filter((model: AIModel) => model.provider === aiProvider));
+  
+  // When provider changes, select the first available model of that provider
+  $effect(() => {
+    if (availableModels.length > 0 && !availableModels.some((m: AIModel) => m.id === aiModel)) {
+      aiModel = availableModels[0].id;
+    }
+  });
   
   // Get prompt types from server data
   const promptTypes = data.promptTypes;
@@ -251,14 +258,14 @@
                   </div>
                 </div>
                 <p class="mt-1 text-xs text-slate-400">
-                  Enter the ID of the Algorand application you want to analyze
+                  Enter the ID of the Algorand application you want to decipher
                 </p>
               </div>
               
               <!-- Analysis Type -->
               <div>
                 <label for="promptType" class="block text-sm font-medium text-slate-300 mb-2">
-                  Analysis Type
+                  Decipher Type
                 </label>
                 <div class="relative">
                   <select
@@ -280,13 +287,9 @@
                 </div>
                 <p class="mt-1 text-xs text-slate-400">
                   {#if promptType === 'standard'}
-                    General explanation of the contract's purpose and functionality
-                  {:else if promptType === 'detailed'}
-                    Detailed technical breakdown of the contract's components
-                  {:else if promptType === 'security'}
-                    Security-focused assessment highlighting potential risks
-                  {:else if promptType === 'userFriendly'}
-                    Simplified explanation for non-technical users
+                    For people: Simple explanation of what this contract does and how it works
+                  {:else if promptType === 'detailed'} 
+                    For developers: In-depth technical analysis of the contract's implementation
                   {/if}
                 </p>
               </div>
@@ -316,10 +319,25 @@
                       <label for="aiProvider" class="block text-sm font-medium text-slate-300 mb-2">
                         AI Provider
                       </label>
-                      <div class="w-full px-4 py-2 bg-slate-700/30 border border-slate-600 rounded-lg text-slate-400 cursor-not-allowed">
-                        Anthropic Claude (Currently Fixed)
+                      <div class="relative">
+                        <select
+                          id="aiProvider"
+                          name="aiProvider"
+                          value={aiProvider}
+                          onchange={(e) => aiProvider = e.currentTarget.value as AIProvider}
+                          class="w-full px-4 py-3 bg-slate-700/50 border border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent text-white appearance-none"
+                          disabled={isAnalyzing}
+                        >
+                          {#each aiProviders as option}
+                            <option value={option.value}>{option.label}</option>
+                          {/each}
+                        </select>
+                        <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-slate-400">
+                          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                          </svg>
+                        </div>
                       </div>
-                      <input type="hidden" name="aiProvider" value={AIProvider.Claude} />
                     </div>
                     
                     <!-- AI Model -->
@@ -327,12 +345,27 @@
                       <label for="aiModel" class="block text-sm font-medium text-slate-300 mb-2">
                         AI Model
                       </label>
-                      <div class="w-full px-4 py-2 bg-slate-700/30 border border-slate-600 rounded-lg text-slate-400 cursor-not-allowed">
-                        Claude Haiku (Currently Fixed)
+                      <div class="relative">
+                        <select
+                          id="aiModel"
+                          name="aiModel"
+                          value={aiModel}
+                          onchange={(e) => aiModel = e.currentTarget.value}
+                          class="w-full px-4 py-3 bg-slate-700/50 border border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent text-white appearance-none"
+                          disabled={isAnalyzing}
+                        >
+                          {#each availableModels as model}
+                            <option value={model.id}>{model.name}</option>
+                          {/each}
+                        </select>
+                        <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-slate-400">
+                          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                          </svg>
+                        </div>
                       </div>
-                      <input type="hidden" name="aiModel" value="claude-haiku" />
                       <p class="mt-1 text-xs text-slate-400">
-                        Claude's fastest and most compact model, designed for high throughput use cases.
+                        {availableModels.find((m: AIModel) => m.id === aiModel)?.description || "Select an AI model"}
                       </p>
                     </div>
                   </div>
@@ -388,9 +421,48 @@
           <div class="bg-slate-800/50 backdrop-blur-sm rounded-xl overflow-hidden shadow-xl border border-slate-700 p-6">
             <div class="flex justify-between items-center mb-4 pb-4 border-b border-slate-700">
               <h2 class="text-xl font-semibold text-white">Smart Contract Translation</h2>
-              <span class="text-sm px-3 py-1 bg-emerald-500/20 text-emerald-400 rounded-full border border-emerald-500/30">
-                {promptTypes.find((p: PromptInfo) => p.value === promptType)?.label || 'Standard Translation'}
-              </span>
+              <div class="flex items-center space-x-3">
+                <button 
+                  onclick={() => {
+                    // Create a JSON object with the response data
+                    const jsonData = {
+                      applicationId,
+                      explanation
+                    };
+                    
+                    // Convert to a JSON string with formatting
+                    const jsonString = JSON.stringify(jsonData, null, 2);
+                    
+                    // Create a Blob object
+                    const blob = new Blob([jsonString], { type: 'application/json' });
+                    
+                    // Create a URL for the Blob
+                    const url = URL.createObjectURL(blob);
+                    
+                    // Create a link element
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `contract-${applicationId}.json`;
+                    
+                    // Append to the body, click, and remove
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    
+                    // Revoke the URL to free up memory
+                    URL.revokeObjectURL(url);
+                  }}
+                  class="flex items-center px-3 py-1.5 bg-slate-700 hover:bg-slate-600 text-slate-200 rounded-lg border border-slate-600 text-sm transition-colors"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                  </svg>
+                  Download JSON
+                </button>
+                <span class="text-sm px-3 py-1 bg-emerald-500/20 text-emerald-400 rounded-full border border-emerald-500/30">
+                  {promptTypes.find((p: PromptInfo) => p.value === promptType)?.label || 'Standard Translation'}
+                </span>
+              </div>
             </div>
             <div class="prose prose-invert max-w-none">
               <p class="whitespace-pre-line text-slate-300">{explanation}</p>

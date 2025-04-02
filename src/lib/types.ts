@@ -1,4 +1,4 @@
-import type { AIProvider, PromptType } from '$lib/types/ai.types';
+import type { AIProvider, PromptType } from '$shared/types';
 
 /**
  * Analysis form data

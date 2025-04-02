@@ -1,5 +1,5 @@
-import type { AIModel, AIModelConfig, AIResponse, AIService, PromptType } from './types';
-import { AIProvider, contractPrompts } from './types';
+import type { AIModel, AIModelConfig, AIResponse, AIService, PromptType } from '$shared/types';
+import { AIProvider, contractPrompts } from '$shared/types';
 import { ClaudeService } from './claude.service';
 import { OpenAIService } from './openai.service';
 import { GeminiService } from './gemini.service';

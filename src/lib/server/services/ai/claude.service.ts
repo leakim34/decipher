@@ -1,6 +1,6 @@
 import { CLAUDE_API_KEY } from '$env/static/private';
-import type { AIModel, AIModelConfig, AIResponse, AIService } from './types';
-import { AIProvider } from './types';
+import type { AIModel, AIModelConfig, AIResponse, AIService } from '$shared/types';
+import { AIProvider } from '$shared/types';
 
 /**
  * Claude AI service implementation
