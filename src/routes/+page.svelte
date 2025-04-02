@@ -21,12 +21,136 @@
   let isAnalyzing = $state(false);
   let showAdvancedOptions = $state(false);
   
+  // Process step messages with different themes
+  type MessageSet = {
+    theme: string;
+    messages: string[];
+  };
+  
+  const processSets: MessageSet[] = [
+    {
+      theme: "Metaphorical Journey",
+      messages: [
+        "Spelunking into the blockchain caves...",
+        "Untangling the base64 spaghetti...",
+        "Translating ancient TEAL hieroglyphics...",
+        "Teaching AI to speak human about what it found..."
+      ]
+    },
+    {
+      theme: "Detective Theme",
+      messages: [
+        "Detective work: Tracking down your contract on the blockchain...",
+        "Decoding the secret base64 message...",
+        "Interrogating the TEAL code for answers...",
+        "Consulting with AI to solve the final puzzle..."
+      ]
+    },
+    {
+      theme: "Kitchen/Cooking Theme",
+      messages: [
+        "Hunting for fresh ingredients on the blockchain...",
+        "Unwrapping the base64 packaging...",
+        "Prepping the raw TEAL for cooking...",
+        "Chef AI preparing your simplified explanation..."
+      ]
+    },
+    {
+      theme: "Space/Alien Theme",
+      messages: [
+        "Launching search probes into the blockchain universe...",
+        "Decrypting alien base64 transmissions...",
+        "Translating TEAL to Earth languages...",
+        "AI ambassador preparing human-friendly message..."
+      ]
+    },
+    {
+      theme: "Translation Theme",
+      messages: [
+        "Finding the contract in blockchain-ese...",
+        "Converting from base64 to something less robotic...",
+        "Decompiling TEAL into almost-human language...",
+        "AI finishing the translation to plain English..."
+      ]
+    },
+    {
+      theme: "Magic Theme",
+      messages: [
+        "Summoning your contract from the blockchain realm...",
+        "Casting 'Decode Base64' spell...",
+        "Transforming cryptic TEAL into readable form...",
+        "AI wizard conjuring the final human-friendly explanation..."
+      ]
+    }
+  ];
+  
+  let currentMessageSet = $state<MessageSet | null>(null);
+  let currentStepIndex = $state(0);
+  let currentMessage = $derived(
+    currentMessageSet?.messages[currentStepIndex] || "Analyzing..."
+  );
+  let progressInterval: number | undefined = undefined;
+  
+  // Function to select a random message set and start the step progression
+  function startProcessAnimation() {
+    // Select a random message set
+    const randomIndex = Math.floor(Math.random() * processSets.length);
+    currentMessageSet = processSets[randomIndex];
+    currentStepIndex = 0;
+    
+    // Clear any existing interval
+    if (progressInterval) clearInterval(progressInterval);
+    
+    // Define the step durations (first 3 steps longer, last step shorter)
+    const stepDurations = [4000, 3500, 3000, 2500]; // ms for each step
+    
+    // Start the progression through steps
+    let nextStepTime = stepDurations[0];
+    progressInterval = setInterval(() => {
+      if (currentStepIndex < currentMessageSet!.messages.length - 1) {
+        currentStepIndex++;
+        
+        // If we've reached the last step or beyond, clear the interval
+        if (currentStepIndex >= currentMessageSet!.messages.length - 1) {
+          if (progressInterval) clearInterval(progressInterval);
+        } else {
+          // Otherwise, adjust the interval for the next step
+          if (progressInterval) clearInterval(progressInterval);
+          nextStepTime = stepDurations[currentStepIndex];
+          progressInterval = setInterval(() => {
+            if (currentStepIndex < currentMessageSet!.messages.length - 1) {
+              currentStepIndex++;
+              
+              // If we've reached the last step, clear the interval
+              if (currentStepIndex >= currentMessageSet!.messages.length - 1) {
+                if (progressInterval) clearInterval(progressInterval);
+              }
+            }
+          }, nextStepTime);
+        }
+      }
+    }, nextStepTime);
+  }
+  
+  // Function to stop the animation
+  function stopProcessAnimation() {
+    if (progressInterval) {
+      clearInterval(progressInterval);
+      progressInterval = undefined;
+    }
+    currentMessageSet = null;
+    currentStepIndex = 0;
+  }
+  
   // Extract form and result data using derived values
   let formData = $derived<AnalysisForm>(form || {});
   let applicationId = $derived(formData.applicationId || '2289177011');
   let promptType = $derived<PromptType>(formData.promptType || 'standard');
-  let aiProvider = $derived<AIProvider>(formData.aiProvider || data.defaultConfig.provider);
-  let aiModel = $derived(formData.aiModel || data.defaultConfig.model);
+  
+  // Fixed to Claude and haiku for now
+  let aiProvider = $state<AIProvider>(AIProvider.Claude);
+  let aiModel = $state('claude-haiku');
+  
   let error = $derived(formData.error);
   let success = $derived(formData.success);
   let explanation = $derived(formData.explanation);
@@ -34,8 +158,8 @@
   
   // Get all models from server data
   const allModels = $state(data.aiModels);
-  // Filter models by provider
-  let availableModels = $derived(allModels.filter((model: AIModel) => model.provider === aiProvider));
+  // Filter models by provider - only Claude models for now
+  let availableModels = $derived(allModels.filter((model: AIModel) => model.provider === AIProvider.Claude));
   
   // Get prompt types from server data
   const promptTypes = data.promptTypes;
@@ -46,18 +170,6 @@
     { value: AIProvider.OpenAI, label: 'OpenAI GPT' },
     { value: AIProvider.Gemini, label: 'Google Gemini' }
   ];
-  
-  // Handle provider change to update available models
-  function handleProviderChange(e: Event) {
-    const target = e.target as HTMLSelectElement;
-    aiProvider = target.value as AIProvider;
-    
-    // Set first available model for this provider if current one isn't valid
-    const modelExists = availableModels.some((m: AIModel) => m.id === aiModel);
-    if (!modelExists && availableModels.length > 0) {
-      aiModel = availableModels[0].id;
-    }
-  }
   
   // Toggle advanced options
   function toggleAdvancedOptions() {
@@ -87,7 +199,7 @@
         </div>
         <div>
           <h1 class="text-2xl font-bold tracking-tight">Decipher</h1>
-          <p class="text-sm opacity-90">Algorand Smart Contract Analyzer</p>
+          <p class="text-sm opacity-90">Smart contracts, dumb simple.</p>
         </div>
       </div>
     </div>
@@ -104,10 +216,12 @@
             action="?/analyze"
             use:enhance={() => {
               isAnalyzing = true;
+              startProcessAnimation();
               
               return async ({ update }) => {
                 await update();
                 isAnalyzing = false;
+                stopProcessAnimation();
               };
             }}
           >
@@ -203,18 +317,10 @@
                       <label for="aiProvider" class="block text-sm font-medium text-slate-300 mb-2">
                         AI Provider
                       </label>
-                      <select
-                        id="aiProvider"
-                        name="aiProvider"
-                        value={aiProvider}
-                        oninput={handleProviderChange}
-                        class="w-full px-4 py-2 bg-slate-700/50 border border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent text-white"
-                        disabled={isAnalyzing}
-                      >
-                        {#each aiProviders as option}
-                          <option value={option.value}>{option.label}</option>
-                        {/each}
-                      </select>
+                      <div class="w-full px-4 py-2 bg-slate-700/30 border border-slate-600 rounded-lg text-slate-400 cursor-not-allowed">
+                        Anthropic Claude (Currently Fixed)
+                      </div>
+                      <input type="hidden" name="aiProvider" value={AIProvider.Claude} />
                     </div>
                     
                     <!-- AI Model -->
@@ -222,21 +328,12 @@
                       <label for="aiModel" class="block text-sm font-medium text-slate-300 mb-2">
                         AI Model
                       </label>
-                      <select
-                        id="aiModel"
-                        name="aiModel"
-                        value={aiModel}
-                        class="w-full px-4 py-2 bg-slate-700/50 border border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent text-white"
-                        disabled={isAnalyzing}
-                      >
-                        {#each availableModels as model}
-                          <option value={model.id}>{model.name}</option>
-                        {/each}
-                      </select>
+                      <div class="w-full px-4 py-2 bg-slate-700/30 border border-slate-600 rounded-lg text-slate-400 cursor-not-allowed">
+                        Claude Haiku (Currently Fixed)
+                      </div>
+                      <input type="hidden" name="aiModel" value="claude-haiku" />
                       <p class="mt-1 text-xs text-slate-400">
-                        {#if aiModel}
-                          {availableModels.find((m: AIModel) => m.id === aiModel)?.description || ''}
-                        {/if}
+                        Claude's fastest and most compact model, designed for high throughput use cases.
                       </p>
                     </div>
                   </div>
@@ -255,12 +352,12 @@
                       <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                       <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                     </svg>
-                    Analyzing...
+                    <span class="transition-all duration-500 ease-in-out">{currentMessage}</span>
                   {:else}
                     <svg xmlns="http://www.w3.org/2000/svg" class="-ml-1 mr-3 h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                       <path fill-rule="evenodd" d="M7 9a2 2 0 114 0 2 2 0 01-4 0zm9-2a2 2 0 100-4 2 2 0 000 4zM4 7a2 2 0 100-4 2 2 0 000 4zm0 10a2 2 0 100-4 2 2 0 000 4zm9-2a2 2 0 114 0 2 2 0 01-4 0zm0-10a2 2 0 114 0 2 2 0 01-4 0zM7 15a2 2 0 114 0 2 2 0 01-4 0z" clip-rule="evenodd" />
                     </svg>
-                    Analyze Contract
+                    Make It Human
                   {/if}
                 </span>
               </button>
