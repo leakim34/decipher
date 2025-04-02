@@ -13,7 +13,6 @@
 		"format": "prettier --write .",
 		"lint": "prettier --check . && eslint .",
 		"prepack": "npm run build",
-
 		"start": "node ./build"
 	},
 	"devDependencies": {
@@ -39,6 +38,7 @@
 	},
 	"dependencies": {
 		"@algorandfoundation/algokit-utils": "^9.0.0",
+		"@sveltejs/adapter-node": "^5.2.12",
 		"algosdk": "^3.0.0"
 	}
 }
