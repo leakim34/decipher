@@ -41,7 +41,7 @@
     
     try {
       // Process input - resolve NFD if needed
-      const input = walletInput.trim();
+      const input = walletInput.trim().toLowerCase();
       
       if (validateWalletAddress(input)) {
         resolvedAddress = input;
