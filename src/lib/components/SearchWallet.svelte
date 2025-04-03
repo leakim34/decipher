@@ -79,7 +79,7 @@
           <input
             type="text"
             id="walletAddress"
-            placeholder="Enter Algorand address or NFD (e.g., example.algo)"
+            placeholder="Algorand address or NFD"
             bind:value={walletInput}
             class="w-full px-4 py-3 bg-slate-700/50 border border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent text-white placeholder-slate-400"
             disabled={isSearching}
@@ -92,7 +92,7 @@
           </div>
         </div>
         <p class="mt-1 text-xs text-slate-400">
-          Algorand address or NFD 
+          Enter an Algorand wallet address or NFD domain (e.g., example.algo)
         </p>
       </div>
       
