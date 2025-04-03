@@ -11,6 +11,7 @@
   import ResultDisplay from '$lib/components/ResultDisplay.svelte';
   import MessageAnimation from '$lib/components/MessageAnimation.svelte';
   import RecentAnalyses from '$lib/components/RecentAnalyses.svelte';
+  import DevelopmentBanner from '$lib/components/DevelopmentBanner.svelte';
   
   // Use props to get data from the server
   let { form, data } = $props<{ 
@@ -47,6 +48,9 @@
 <div class="min-h-screen bg-gradient-to-br from-slate-900 to-slate-800 text-slate-100">
   <!-- Header -->
   <Header />
+  
+  <!-- Development Banner -->
+  <DevelopmentBanner />
   
   <main class="container mx-auto px-4 py-10">
     <div class="max-w-3xl mx-auto">
