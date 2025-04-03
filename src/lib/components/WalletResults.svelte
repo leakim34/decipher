@@ -123,24 +123,7 @@
         </table>
       </div>
       
-      <!-- Analyze button for selected app -->
-      <button
-        type="button"
-        disabled={selectedAppId === null}
-        class="w-full py-3 px-4 mt-6 bg-gradient-to-r from-emerald-600 to-teal-500 text-white rounded-lg hover:from-emerald-700 hover:to-teal-600 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 focus:ring-offset-slate-800 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg"
-        onclick={() => {
-          if (selectedAppId !== null) {
-            selectAndSwitchToApp(selectedAppId);
-          }
-        }}
-      >
-        <span class="flex items-center justify-center">
-          <svg xmlns="http://www.w3.org/2000/svg" class="-ml-1 mr-3 h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-            <path fill-rule="evenodd" d="M7 9a2 2 0 114 0 2 2 0 01-4 0zm9-2a2 2 0 100-4 2 2 0 000 4zM4 7a2 2 0 100-4 2 2 0 000 4zm0 10a2 2 0 100-4 2 2 0 000 4zm9-2a2 2 0 114 0 2 2 0 01-4 0zm0-10a2 2 0 114 0 2 2 0 01-4 0zM7 15a2 2 0 114 0 2 2 0 01-4 0z" clip-rule="evenodd" />
-          </svg>
-          {selectedAppId ? `Analyze Application ${selectedAppId}` : 'Select an Application'}
-        </span>
-      </button>
+     
     {/if}
   </div>
 </div> 

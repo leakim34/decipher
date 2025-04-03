@@ -13,6 +13,8 @@ export interface AppState {
   resolvedAddress: string;
   walletInteractions: ApplicationInteraction[];
   
+
+  
   // Methods
   selectApplication: (appId: number | string | null) => void;
   switchToApplicationTab: () => void;
@@ -30,7 +32,9 @@ export class AppStateStore {
   public walletInteractions = $state<ApplicationInteraction[]>([]);
   
   // Private constructor to enforce singleton pattern
-  private constructor() {}
+  private constructor() {
+
+  }
   
   // Get the singleton instance
   public static getInstance(): AppStateStore {
@@ -52,6 +56,9 @@ export class AppStateStore {
   public switchToApplicationTab(): void {
     this.activeTab = 'application';
   }
+  public switchToWalletTab(): void {
+    this.activeTab = 'wallet';
+  }
   
   // Update wallet interactions data
   public setWalletData(
@@ -63,6 +70,12 @@ export class AppStateStore {
     this.resolvedAddress = resolvedAddress;
     this.walletInteractions = interactions;
   }
+  public setWalletAddress(address: string): void {
+    this.walletAddress = address;
+    this.switchToWalletTab();
+  }
+  
+  
 }
 
 // Export a singleton instance

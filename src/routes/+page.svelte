@@ -20,7 +20,7 @@
       recentAnalyses: CachedAnalysisResult[];
     };
   }>();
-  
+
   // Extract form and result data using derived values
   let formData = $derived<AnalysisForm>(form || {});
   let applicationId = $derived(formData.applicationId || '');

@@ -12,6 +12,11 @@
   let walletInteractions = $state<ApplicationInteraction[]>([]);
   let hasSearched = $state(false);
   
+  $effect(() => {
+    if (appState.walletAddress) {
+      walletInput = appState.walletAddress;
+    }
+  });
   // Validation function
   function validateInput() {
     validationError = '';
@@ -33,33 +38,34 @@
   // Handle searching for wallet interactions
   async function searchWallet() {
     if (!validateInput()) {
+      console.log('Input validation failed');
       return;
     }
     
+    console.log('Starting wallet search...');
     isSearching = true;
     hasSearched = true;
     
     try {
       // Process input - resolve NFD if needed
-      const input = walletInput.trim().toLowerCase();
+      const input = walletInput.trim();
       
       if (validateWalletAddress(input)) {
         resolvedAddress = input;
       } else if (isNFDDomain(input)) {
         resolvedAddress = await resolveNFDToAddress(input);
       }
-      //console.log('Resolved address:', resolvedAddress);
-      // Fetch wallet interactions
+
       const interactions = await fetchWalletApplicationInteractions(resolvedAddress);
       walletInteractions = interactions;
       
-      // Update the app state store
       appState.setWalletData(walletInput, resolvedAddress, interactions);
     } catch (error) {
       console.error('Error fetching wallet data:', error);
       validationError = error instanceof Error ? error.message : 'Error fetching wallet data';
       walletInteractions = [];
     } finally {
+      console.log('Search completed');
       isSearching = false;
     }
   }

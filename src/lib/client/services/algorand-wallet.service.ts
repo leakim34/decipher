@@ -9,6 +9,7 @@ export function validateWalletAddress(address: string): boolean {
   try {
     return algosdk.isValidAddress(address);
   } catch (error) {
+    console.error('Error validating wallet address:', error);
     return false;
   }
 }
@@ -40,7 +41,7 @@ export async function resolveNFDToAddress(nfdDomain: string): Promise<string> {
     //console.log(`Resolving NFD domain: ${nfdDomain}`);
     
     // Make request to NFD API
-    const response = await fetch(`https://api.nf.domains/nfd/${nfdDomain}?view=brief&poll=false&nocache=false`, {
+    const response = await fetch(`https://api.nf.domains/nfd/${nfdDomain.toLowerCase()}?view=brief&poll=false&nocache=false`, {
       headers: {
         'accept': 'application/json'
       }
