@@ -40,7 +40,7 @@ export class CacheService {
    * Internal Redis initialization method
    */
   private async _initializeRedis(): Promise<void> {
-    console.log('Initializing Redis connection...');
+    //console.log('Initializing Redis connection...');
     
     try {
       // Create Redis client
@@ -61,7 +61,7 @@ export class CacheService {
       
       // @ts-ignore - TypeScript doesn't recognize the on method but it exists
       this.client.on('connect', () => {
-        console.log('Connected to Redis successfully');
+        //console.log('Connected to Redis successfully');
         this.isConnected = true;
         this.useMemoryFallback = false;
       });
@@ -79,10 +79,10 @@ export class CacheService {
       // Race the connection against the timeout
       await Promise.race([connectPromise, timeoutPromise]);
       
-      console.log('Redis initialization completed');
+      //console.log('Redis initialization completed');
     } catch (error) {
       console.error('Failed to initialize Redis client:', error);
-      console.log('Using in-memory cache instead');
+      //console.log('Using in-memory cache instead');
       this.useMemoryFallback = true;
       
       // Don't rethrow the error, just fall back to memory cache
@@ -177,7 +177,7 @@ export class CacheService {
         this.cacheExpiration,
         JSON.stringify(data)
       );
-      console.log(`Cached analysis for application ${applicationId} in Redis`);
+      //console.log(`Cached analysis for application ${applicationId} in Redis`);
     } catch (error) {
       console.error('Error caching analysis in Redis:', error);
       // Analysis is already in memory cache as backup

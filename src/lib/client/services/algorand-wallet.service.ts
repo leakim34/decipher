@@ -37,7 +37,7 @@ export async function resolveNFDToAddress(nfdDomain: string): Promise<string> {
   try {
     // This would be implemented with NFD API
     // For now, return a mock address for demonstration
-    console.log(`Resolving NFD domain: ${nfdDomain}`);
+    //console.log(`Resolving NFD domain: ${nfdDomain}`);
     
     // Make request to NFD API
     const response = await fetch(`https://api.nf.domains/nfd/${nfdDomain}?view=brief&poll=false&nocache=false`, {
@@ -99,7 +99,7 @@ export async function fetchWalletApplicationInteractions(
     }
     
     // Fetch transactions from indexer
-    console.log(`Fetching application interactions for wallet: ${address}`);
+    //console.log(`Fetching application interactions for wallet: ${address}`);
     const {transactions} = await indexerClient.searchForTransactions().txType('appl').address(address).limit(limit).do();
 
     // Create a map to track unique app IDs with their first transaction
@@ -121,7 +121,7 @@ export async function fetchWalletApplicationInteractions(
     // Convert map values to array
     const interactions = Array.from(uniqueApps.values());
     
-    console.log('Unique application interactions:', interactions);
+    //console.log('Unique application interactions:', interactions);
     return interactions;
   } catch (error) {
     console.error('Error fetching wallet interactions:', error);

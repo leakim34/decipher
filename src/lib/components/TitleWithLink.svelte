@@ -13,7 +13,7 @@
 </script>
 
 <div class={`flex justify-between items-center mb-4 pb-3 border-b border-slate-700 ${className}`}>
-  <h2 class="text-xl font-semibold text-slate-200">{title}</h2>
+  <h2 class="text-xl font-semibold text-slate-200">Application {applicationId}</h2>
   {#if applicationId}
     <a 
       href={explorerUrl}
@@ -24,7 +24,7 @@
       <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
       </svg>
-      View on Explorer
+      View on Allo
     </a>
   {/if}
 </div> 

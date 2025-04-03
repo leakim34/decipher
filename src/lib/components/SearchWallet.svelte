@@ -48,7 +48,7 @@
       } else if (isNFDDomain(input)) {
         resolvedAddress = await resolveNFDToAddress(input);
       }
-      console.log('Resolved address:', resolvedAddress);
+      //console.log('Resolved address:', resolvedAddress);
       // Fetch wallet interactions
       const interactions = await fetchWalletApplicationInteractions(resolvedAddress);
       walletInteractions = interactions;

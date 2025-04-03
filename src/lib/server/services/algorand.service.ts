@@ -14,7 +14,7 @@ export function validateApplicationId(applicationId: string): boolean {
  * Disassembles TEAL bytecode into human-readable TEAL code
  */
 export async function disassembleTEAL(base64Program: string): Promise<string> {
-  console.log('Disassembling TEAL bytecode...');
+  //console.log('Disassembling TEAL bytecode...');
   
   try {
       const response = await fetch(`${PUBLIC_ALGOD_URL}/v2/teal/disassemble`, {
@@ -49,11 +49,11 @@ export async function fetchApplicationInfo(applicationId: string) {
 
   try {
     // Initialize Algorand indexer client
-    console.log('Initializing Algorand indexer client...');
+    //console.log('Initializing Algorand indexer client...');
     const indexerClient = new algosdk.Indexer('', PUBLIC_INDEXER_URL, 443);
     
     // Fetch application info
-    console.log('Fetching application info for ID:', applicationId);
+    //console.log('Fetching application info for ID:', applicationId);
     const appInfo = await indexerClient.lookupApplications(parseInt(applicationId)).do();
     
     if (!appInfo.application?.params?.approvalProgram) {

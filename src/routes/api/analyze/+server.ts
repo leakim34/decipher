@@ -60,7 +60,7 @@ export const GET: RequestHandler = async ({ url }) => {
     const cachedAnalysis = await cacheService.getCachedAnalysis(applicationId);
     
     if (cachedAnalysis) {
-      console.log(`Found cached analysis for application ${applicationId}`);
+      //console.log(`Found cached analysis for application ${applicationId}`);
       return json({
         success: true,
         applicationId,
@@ -70,19 +70,19 @@ export const GET: RequestHandler = async ({ url }) => {
       });
     }
     
-    console.log(`No cached analysis found for application ${applicationId}, generating new analysis...`);
+    //console.log(`No cached analysis found for application ${applicationId}, generating new analysis...`);
     
     // Get the TEAL code for the application
-    console.log('Fetching and disassembling TEAL code...');
+    //console.log('Fetching and disassembling TEAL code...');
     const decodedProgram = await getApplicationTEAL(applicationId);
     
     // Initialize AI service factory
     const aiServiceFactory = AIServiceFactory.getInstance();
     
     // Analyze the smart contract using default AI provider
-    console.log(`Analyzing with default configuration: ${defaultAIConfig.provider}/${defaultAIConfig.model}`);
+    //console.log(`Analyzing with default configuration: ${defaultAIConfig.provider}/${defaultAIConfig.model}`);
     const analysis = await aiServiceFactory.analyzeSmartContract(decodedProgram, defaultAIConfig);
-    console.log('Successfully generated explanation');
+    //console.log('Successfully generated explanation');
     
     // Parse the response to extract the sections
     const { basicOverview, detailedAnalysis } = parseAnalysisResponse(analysis.text);
@@ -144,7 +144,7 @@ export const POST: RequestHandler = async ({ request }) => {
     const cachedAnalysis = await cacheService.getCachedAnalysis(applicationId);
     
     if (cachedAnalysis) {
-      console.log(`Found cached analysis for application ${applicationId}`);
+      //console.log(`Found cached analysis for application ${applicationId}`);
       return json({
         success: true,
         applicationId,
@@ -154,19 +154,19 @@ export const POST: RequestHandler = async ({ request }) => {
       });
     }
     
-    console.log(`No cached analysis found for application ${applicationId}, generating new analysis...`);
+    //console.log(`No cached analysis found for application ${applicationId}, generating new analysis...`);
     
     // Get the TEAL code for the application
-    console.log('Fetching and disassembling TEAL code...');
+    //console.log('Fetching and disassembling TEAL code...');
     const decodedProgram = await getApplicationTEAL(applicationId);
     
     // Initialize AI service factory
     const aiServiceFactory = AIServiceFactory.getInstance();
     
     // Analyze the smart contract using default AI provider
-    console.log(`Analyzing with default configuration: ${defaultAIConfig.provider}/${defaultAIConfig.model}`);
+    //console.log(`Analyzing with default configuration: ${defaultAIConfig.provider}/${defaultAIConfig.model}`);
     const analysis = await aiServiceFactory.analyzeSmartContract(decodedProgram, defaultAIConfig);
-    console.log('Successfully generated explanation');
+    //console.log('Successfully generated explanation');
     
     // Parse the response to extract the sections
     const { basicOverview, detailedAnalysis } = parseAnalysisResponse(analysis.text);
