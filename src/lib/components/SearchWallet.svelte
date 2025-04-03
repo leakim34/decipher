@@ -92,7 +92,7 @@
           </div>
         </div>
         <p class="mt-1 text-xs text-slate-400">
-          Enter an Algorand wallet address or NFD domain (e.g., example.algo)
+          Algorand address or NFD 
         </p>
       </div>
       

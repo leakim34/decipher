@@ -17,7 +17,7 @@
       </div>
       <div>
         <h1 class="text-2xl font-bold tracking-tight">Decipher</h1>
-        <p class="text-sm opacity-90">Smart contracts, dumb simple.</p>
+        <p class="text-sm opacity-90">Human-readable TEAL</p>
       </div>
     </div>
   </div>

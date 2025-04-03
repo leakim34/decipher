@@ -12,7 +12,7 @@
 
 ## What's this about?
 
-Built during the **Algorand Foundation's Dev Retreat 2025**, Decipher turns gobbledygook smart contract code into plain English. Because let's face it - nobody outside dev teams actually understands what they're approving when they sign transactions.
+Built during the **Algorand Foundation's Dev Retreat 2025**, Decipher turns gobbledygook TEAL code into plain English. Because let's face it - nobody outside dev teams actually understands what they're approving when they sign transactions, so it might end up (at some point) in a tool that let you know what you're actually about to sign.
 
 This tool:
 - Translates TEAL code into words normal humans can understand

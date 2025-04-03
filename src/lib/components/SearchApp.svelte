@@ -72,7 +72,7 @@
               type="text"
               id="applicationId"
               name="applicationId"
-              placeholder="Enter Algorand application ID"
+              placeholder="Enter Application ID"
               bind:value={applicationId}
               oninput={() => {
                 // Update the store with the input value
