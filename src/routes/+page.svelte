@@ -97,7 +97,7 @@
       {/if}
       
       <!-- Recent Analyses - only show on application tab or when no search has been performed -->
-      {#if activeTab === 'application' && success}
+      {#if activeTab === 'application'}
         <RecentAnalyses 
           analyses={recentAnalyses}
         />
