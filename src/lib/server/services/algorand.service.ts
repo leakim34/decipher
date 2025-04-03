@@ -1,5 +1,5 @@
 import algosdk from 'algosdk';
-import { ALGOD_URL, INDEXER_URL } from '$env/static/private';
+import { PUBLIC_ALGOD_URL, PUBLIC_INDEXER_URL } from '$env/static/public';
 
 /**
  * Validates the Algorand application ID format
@@ -17,7 +17,7 @@ export async function disassembleTEAL(base64Program: string): Promise<string> {
   console.log('Disassembling TEAL bytecode...');
   
   try {
-    const response = await fetch(`${ALGOD_URL}/v2/teal/disassemble`, {
+      const response = await fetch(`${PUBLIC_ALGOD_URL}/v2/teal/disassemble`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/x-binary'
@@ -50,7 +50,7 @@ export async function fetchApplicationInfo(applicationId: string) {
   try {
     // Initialize Algorand indexer client
     console.log('Initializing Algorand indexer client...');
-    const indexerClient = new algosdk.Indexer('', INDEXER_URL, 443);
+    const indexerClient = new algosdk.Indexer('', PUBLIC_INDEXER_URL, 443);
     
     // Fetch application info
     console.log('Fetching application info for ID:', applicationId);
