@@ -67,8 +67,11 @@ export class ClaudeService implements AIService {
       
       if (!response.ok) {
         const errorData = await response.json();
-        console.error('Claude API error:', errorData);
-        throw new Error(`Failed to communicate with Claude API: ${response.status}`);
+        console.error('Claude API error:', errorData, response.status);
+        if (response.status === 529) {
+          throw new Error('Claude is taking a coffee break to recharge. Please try again when the caffeine kicks in! ☕');
+        }
+        throw new Error(`Failed to communicate with Claude API: ${errorData.error.message}`);
       }
       
       const data = await response.json();
@@ -83,7 +86,8 @@ export class ClaudeService implements AIService {
       };
     } catch (error) {
       console.error('Error generating explanation with Claude:', error);
-      throw new Error('Failed to generate explanation with Claude');
+      throw error
+      // throw new Error('Failed to generate explanation with Claude');
     }
   }
 

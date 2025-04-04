@@ -60,7 +60,6 @@ export async function resolveNFDToAddress(nfdDomain: string): Promise<string> {
     
     // Mock response - in production we'd call the NFD API
     // For example: https://api.nf.domains/nfd/lookup?name=example.algo
-    return 'ZZAF5ARA4MEC5NSRJT44LHZ4RK75QBNEFXAR6AYXKVARG6SJDGQJRVZPKA';
   } catch (error) {
     console.error('Error resolving NFD domain:', error);
     throw new Error(`Failed to resolve NFD domain ${nfdDomain}`);
